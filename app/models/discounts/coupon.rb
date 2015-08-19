@@ -1,23 +1,79 @@
 module Discounts
   class Coupon < ActiveRecord::Base
-    # ATTRIBUTES
-    # string code - cant be null
-    # string description - put limit of 120 like twitter
-    # datetime valid_from - cant be null, Time.current by default
-    # datetime valid_until - if null then coupon never expires
-    # integer limit (max times can be used) - cant be null, if zero then no limit
-    # integer redeemed - (times been used so far) - cant be null, default is zero
-    # decimal amount - cant be null, default zero
-    # integer type - enum percentage, amount
-    #
-    # METHODS
-    # def autogenerate code when creating and no code entered, before_create -> autogenerate code if code null
-    # def apply(price) - see what discount would be
-    # def redeem(job) - apply discount to job, default is def redeem(object) which saves into objects coupon_code field
+
+    after_initialize do
+      self.code ||= self.generate_code
+      self.valid_from ||= Date.current
+    end
+
+    enum type: [:percentage, :portion]
+
+    validates :code, :valid_from, :limit, :type, :redeemed, :amount, presence: true
+    validates :description, length: { maximum: 160 }
+    validates :amount, numericality: { greater_than: 0 }
+    validates :amount, numericality: { less_than_or_equal_to: 100, if: :percentage? }
+
+    def generate_code
+      SecureRandom.hex(6)[0, 6].upcase
+    end
+
+    def begins
+      valid_from.strftime('%d/%m/%Y')
+    end
+
+    def expires
+      if valid_until
+        valid_until.strftime('%d/%m/%Y')
+      else
+        'Never'
+      end
+    end
+
+    def begun?
+      Time.current > valid_from
+    end
+
+    def expired?
+      valid_until && Time.current > valid_until
+    end
+
+    def spent?
+      redeemed >= limit
+    end
+
+    def redeemable?
+      begun? && !expired? && !spent?
+    end
+
+    def free?
+      percentage? && amount == 100
+    end
+
+    def apply(price) # What price will be after discount
+      if percentage?
+        price - (price * (amount/100))
+      elsif portion?
+        price - amount
+      end
+    end
+
+    def discounted(price) # How much is taken off
+      if percentage?
+        price * (amount/100)
+      elsif portion?
+        amount
+      end
+    end
+
+    def redeem_on(item) # Save coupon code to an item (item will be job)
+      Coupon.transaction do
+        item.update!(coupon_code: code)
+        self.update!(redeemed: redeemed + 1)
+      end
+    end
+
     #
     # NB
-    # maybe integer job_id
-    # free is percentage 100
     # use query to find completed or uncompleted jobs that have used coupon
     # jobs must store coupon code
     # controller and views are generic and then in main app put inside admin security and styling layouts

@@ -14,3 +14,8 @@ $ bundle install
 $ rake discounts:install:migrations
 $ rake db:migrate
 ```
+
+In config/routes
+```ruby
+mount Discounts::Engine, at: "/discounts"
+```
