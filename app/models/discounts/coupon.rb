@@ -34,11 +34,11 @@ module Discounts
     end
 
     def expired?
-      valid_until && Time.current > valid_until
+      valid_until? && Time.current > valid_until
     end
 
     def spent?
-      redeemed >= limit
+      limit > 0 && redeemed >= limit
     end
 
     def redeemable?
@@ -67,6 +67,7 @@ module Discounts
 
     def redeem_on(item) # Save coupon code to an item (item will be job)
       Coupon.transaction do
+        return if item.coupon_code == code
         item.update!(coupon_code: code)
         self.update!(redeemed: redeemed + 1)
       end
