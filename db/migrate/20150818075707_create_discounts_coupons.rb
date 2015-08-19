@@ -8,7 +8,7 @@ class CreateDiscountsCoupons < ActiveRecord::Migration
       t.integer :limit, default: 0, null: false
       t.integer :redeemed, default: 0, null: false
       t.decimal :amount, precision: 5, scale: 2, default: 0, null: false
-      t.integer :type, null: false
+      t.integer :amount_type, null: false
 
       t.timestamps null: false
     end

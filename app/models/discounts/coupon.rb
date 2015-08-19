@@ -6,9 +6,9 @@ module Discounts
       self.valid_from ||= Date.current
     end
 
-    enum type: [:percentage, :portion]
+    enum amount_type: [:percentage, :portion]
 
-    validates :code, :valid_from, :limit, :type, :redeemed, :amount, presence: true
+    validates :code, :valid_from, :limit, :amount_type, :redeemed, :amount, presence: true
     validates :description, length: { maximum: 160 }
     validates :amount, numericality: { greater_than: 0 }
     validates :amount, numericality: { less_than_or_equal_to: 100, if: :percentage? }
