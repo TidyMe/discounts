@@ -2,9 +2,9 @@ module Discounts
   module CouponsHelper
     def display_amount(coupon)
       if coupon.percentage?
-        "#{number_to_percentage(coupon.amount, strip_insignificant_zeros: true)} off!"
+        "#{number_to_percentage(coupon.amount, strip_insignificant_zeros: true)} Off!"
       elsif coupon.portion?
-        "#{number_to_currency(coupon.amount)} off!"
+        "#{number_to_currency(coupon.amount)} Off!"
       end
     end
 
