@@ -19,3 +19,8 @@ In config/routes
 ```ruby
 mount Discounts::Engine, at: "/discounts"
 ```
+
+In app/controllers/application\_controller.rb
+```ruby
+helper Discounts::Engine.helpers
+```
