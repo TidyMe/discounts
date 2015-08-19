@@ -12,6 +12,11 @@ module Discounts
     validates :description, length: { maximum: 160 }
     validates :amount, numericality: { greater_than: 0 }
     validates :amount, numericality: { less_than_or_equal_to: 100, if: :percentage? }
+    validate :valid_until_comes_after_valid_from
+
+    def valid_until_comes_after_valid_from
+      errors.add(:valid_until, 'must come after valid from') if valid_until && valid_until < valid_from
+    end
 
     def generate_code
       SecureRandom.hex(6)[0, 6].upcase

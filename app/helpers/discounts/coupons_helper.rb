@@ -11,5 +11,9 @@ module Discounts
     def display_discount(coupon, price)
       "- #{number_to_currency(coupon.discounted(price))}"
     end
+
+    def display_limit(coupon)
+      coupon.limit == 0 ? 'None' : coupon.limit
+    end
   end
 end

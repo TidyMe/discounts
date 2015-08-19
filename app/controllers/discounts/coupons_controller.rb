@@ -56,7 +56,7 @@ module Discounts
 
       # Only allow a trusted parameter "white list" through.
       def coupon_params
-        params.require(:coupon).permit(:code)
+        params.require(:coupon).permit(:code, :description, :valid_from, :valid_until, :limit, :amount, :amount_type)
       end
   end
 end
